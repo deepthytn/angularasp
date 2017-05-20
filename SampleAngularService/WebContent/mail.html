@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script type="text/javascript" src="js/angular.js"></script>
+<script type="text/javascript" src="js/angular-resource.js"></script>
+<script type="text/javascript" src="js/angular-route.js"></script>
+<script type="text/javascript" src="js/angular-cookies.js"></script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script  type="text/javascript" src="js/sockjs.js"></script>
+<script   type="text/javascript" src="js/stomp.js"></script>
+<script   type="text/javascript" src="js/loading-bar.js"></script>
+<script   type="text/javascript" src="EmailService.js"></script>
+</head>
+<body>
+<div ng-app="myApp" ng-controller="emailController"> 
+<form action="mailto:deepthytn@gmail.com" method="post" enctype="text/plain">
+Name:<br>
+<input type="text" ng-model="email.name" name="name"><br>
+E-mail:<br>
+<input type="text" ng-model="email.email" name="mail"><br>
+Comment:<br>
+<input type="text" ng-model="email.comment" name="comment" size="50"><br><br>
+<button type="button" class="btn btn-primary btn-block" ng-click="sentEmail()">Sent</button>
+<input type="reset" value="Reset">
+</div>
+</form>
+<script>
+var app = angular.module('myApp', []);
+app.controller('emailController', function($scope, $http,EmailService) {
+	$scope.sentEmail=function(){
+		
+		console.log('Entering registerUser()');
+		EmailService.emailUser($scope.email)
+		.then(function(response)
+		{												//success
+			console.log("Registration success: "+ response.status)
+			alert("Registered successfully!...Please login using the registered username and password");
+			$location.path("/login");
+		}
+		,
+		function(response)
+		{												//failure
+			console.log("Registration failure: "+ response.status)
+			console.log(response.data)
+			$scope.errorMessage="Registration failed!..."+response.data.message
+			$location.path("/register")
+		})
+	}
+  });
+
+
+
+</script>
+<script type="text/javascript">
+app.factory('EmailService',function($http)
+		{
+			var emailService=this;
+			var BASE_URL="http://localhost:8181/emailbackend"
+				emailService.emailUser=function(email)
+				{
+					console.log('Entering emailService ')
+					return $http.post(BASE_URL + "/sendmail",email);
+				}
+			return emailService;
+			
+		});
+
+</script>
+
+<body>
+
+</body>
+</html>
